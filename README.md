@@ -6,7 +6,7 @@ La documentacion de ocelot se encuentra en el siguiente link [DOC](https://ocelo
 ## Tecnologias
 La tecnologia que usa esta app son las siguientes:
 - C#
-- .Net 8
+- net6.0
 - Swagger (Open API)
 ## Rutas disponibles
 Para entrar a la documentacion (swagger):
