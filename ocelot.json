@@ -18,16 +18,7 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5250/",
-    "AuthenticationProviders": [
-      {
-        "Key": "Keycloak",
-        "Keycloak": {
-          "ProviderRootUrl": "http://localhost:8080/realms/SuperTienda",
-          "ApiName": "OcelotClient",
-          "ApiSecret": "dSL9U6ZxdV0dac4fc2W3wzbVe3ggltUF"
-        }
-      }
-    ]
+    "BaseUrl": "http://localhost:5250/"
+    
   }
 }

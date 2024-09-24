@@ -29,22 +29,13 @@ builder.Services.AddCors(options =>
 });
 
 // Configurar autenticación con JWT
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication("Keycloak")
     .AddJwtBearer("Keycloak", options =>
     {
         options.Authority = "http://localhost:8080/realms/SuperTienda";
-        options.Audience = "OcelotClient";
+        options.Audience = "account";
         options.RequireHttpsMetadata = false; // Solo para entornos de desarrollo
-        /*
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidIssuer = "http://localhost:8080/realms/SuperTienda",
-            ValidAudience = "OcelotClient"
-        };
-        */
+
     });
 
 // Agregamos el servicio de ocelot
