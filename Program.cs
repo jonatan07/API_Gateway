@@ -1,50 +1,53 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
-/*
-var builder = new WebHostBuilder()
-            .UseKestrel()
-            .UseContentRoot(Directory.GetCurrentDirectory())
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config
-                    .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
-                    .AddJsonFile("appsettings.json", true, true)
-                    .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                    .AddJsonFile("ocelot.json")
-                    .AddEnvironmentVariables();
-            })
-            .ConfigureServices(s =>
-            {
-                
-                s.AddOcelot();
-            })
-            .ConfigureLogging((hostingContext, logging) =>
-            {
-                //add your logging
-            })
-            .UseIISIntegration()
-            .Configure(app =>
-            {
-                app.UseOcelot().Wait();
-            })
-            .Build()
-            .Run();
-*/
-// Add services to the container.
 
+// Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Cargamos el archivo de configuracion
-//builder.Configuration.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
 builder.Configuration.AddJsonFile("appsettings.json", true, true);
 builder.Configuration.AddJsonFile("ocelot.json");
-// agregamos el servicio de ocelot
+
+// Definir la política CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
+// Configurar autenticación con JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer("Keycloak", options =>
+    {
+        options.Authority = "http://localhost:8080/realms/SuperTienda";
+        options.Audience = "OcelotClient";
+        options.RequireHttpsMetadata = false; // Solo para entornos de desarrollo
+        /*
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidIssuer = "http://localhost:8080/realms/SuperTienda",
+            ValidAudience = "OcelotClient"
+        };
+        */
+    });
+
+// Agregamos el servicio de ocelot
 builder.Services.AddOcelot();
 var app = builder.Build();
 
@@ -57,10 +60,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Usar la política CORS
+app.UseCors("AllowSpecificOrigins");
+
 app.UseAuthorization();
 
 app.MapControllers();
-// Usamos el servicio.
+
+app.UseAuthentication();
+
+// Usamos el servicio de ocelot.
 await app.UseOcelot();
 
 app.Run();
