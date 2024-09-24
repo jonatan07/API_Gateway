@@ -33,7 +33,7 @@ builder.Services.AddAuthentication("Keycloak")
     .AddJwtBearer("Keycloak", options =>
     {
         options.Authority = "http://localhost:8080/realms/SuperTienda";
-        options.Audience = "account";
+        options.Audience = "OcelotClient";
         options.RequireHttpsMetadata = false; // Solo para entornos de desarrollo
 
     });
